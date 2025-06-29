@@ -1,103 +1,167 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import React, { useEffect, useState } from 'react';
+import gsap from 'gsap';
+import FitnessCarousel from '../components/FitnessCarousel';
+
+export default function HomePage() {
+  const [boxWidth, setBoxWidth] = useState('50vw');
+
+  useEffect(() => {
+    // Handle responsive breakpoints
+    const updateBoxWidth = () => {
+      const width = window.innerWidth;
+      if (width >= 1200) setBoxWidth('25vw');        // 4 boxes
+      else if (width >= 768) setBoxWidth('33.33vw'); // 3 boxes
+      else setBoxWidth('50vw');                      // 2 boxes
+    };
+
+    updateBoxWidth(); // run on mount
+    window.addEventListener('resize', updateBoxWidth);
+    return () => window.removeEventListener('resize', updateBoxWidth);
+  }, []);
+
+useEffect(() => {
+  const isFirstLoad = sessionStorage.getItem('fitzy_first_load') !== 'false';
+
+  const boxes = document.querySelectorAll('.container1 .box');
+  boxes.forEach((box) => {
+    const el = box as HTMLElement;
+    el.style.opacity = '0.4';
+    el.style.transform = 'translateY(0)'; 
+  });
+
+  if (isFirstLoad) {
+    const tl = gsap.timeline();
+
+    tl.from(".container1 .b1", { y: 50, opacity: 0, duration: 0.6 });
+    tl.from(".container1 .b2", { y: 50, opacity: 0, duration: 0.6 });
+    tl.from(".container1 .b3", { y: 50, opacity: 0, duration: 0.6 });
+    tl.from(".container1 .b4", { y: 50, opacity: 0, duration: 0.6 });
+
+    tl.to(".container1", { opacity: 0.5, duration: 1 });
+    tl.fromTo(".overlay", { opacity: 0 }, { opacity: 1, duration: 1 });
+    tl.fromTo(".navbar", { opacity: 0 }, { opacity: 1, duration: 1 });
+    tl.fromTo(".overlay .title", { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 1 });
+
+    // Flag so it doesn't animate on navigation
+    sessionStorage.setItem('fitzy_first_load', 'false');
+  }
+}, []);
+
+  const imageUrls = [
+    '/images/1.jpg',
+    '/images/2.jpeg',
+    '/images/3.jpeg',
+    '/images/4.jpeg',
+  ];
+
+  const styles: { [key: string]: React.CSSProperties } = {
+    page: {
+      position: 'relative',
+      height: '100vh',
+      width: '100vw',
+      overflow: 'hidden',
+      margin: 0,
+      fontFamily: 'Arial, sans-serif',
+      backgroundColor: '#f5f5f5',
+    },
+    container: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      display: 'flex',
+      height: '100vh',
+      width: '100vw',
+      maxWidth: '100vw',
+      zIndex: 0,
+      overflow: 'hidden',
+    },
+    box: (imgUrl: string): React.CSSProperties => ({
+      flex: `0 0 ${boxWidth}`, // use responsive width here
+      height: '100vh',
+      backgroundImage: `url(${imgUrl})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      opacity: 0.4,
+      transform: 'translateY(50px)',
+      transition: 'opacity 0.3s ease',
+    }),
+
+    overlay: {
+      position: 'relative',
+      zIndex: 1,
+      height: '100vh',
+      width: '100vw',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      pointerEvents: 'none',
+    },
+    title: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
+    h1: {
+      fontFamily: 'var(--font-shrikhand)',
+      fontSize: 'clamp(3rem, 10vw, 10rem)',
+      color: 'white',
+      fontWeight: 'lighter',
+      position: 'relative',
+      zIndex: 2,
+      margin: 0,
+    },
+    h1BeforeAfter: (offset: number, color: string): React.CSSProperties => ({
+      content: '"Fitzy"',
+      position: 'absolute',
+      top: `${offset}px`,
+      left: `${offset + 5}px`,
+      color,
+      zIndex: -1,
+    }),
+    h2: {
+      fontFamily: 'var(--font-dm-serif)',
+      fontSize: 'clamp(1rem, 2vw, 2rem)',
+      color: '#444',
+      textAlign: 'center',
+      lineHeight: 1.4,
+      fontWeight: 'normal',
+      marginTop: '0.5rem',
+      marginInline: '1rem',
+    },
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div>
+      <div style={styles.page}>
+        {/* Page 1: Image scroller with overlay */}
+      <div className="container1" style={styles.container}>
+        {imageUrls.map((url, index) => (
+          <div key={index} className={`box b${index + 1}`} style={styles.box(url)} />
+        ))}
+      </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      <div className="overlay" style={styles.overlay}>
+        <div className="title" style={styles.title}>
+          <h1 style={styles.h1}>
+            Fitzy
+            <span style={styles.h1BeforeAfter(10, '#666')}>Fitzy</span>
+            <span style={styles.h1BeforeAfter(5, '#333')}>Fitzy</span>
+          </h1>
+          <h2 style={styles.h2}>
+            Small steps, big results!
+            <br />
+            Show up for yourself every day
+          </h2>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+    </div>
+
+    {/* Page 2: Fitness Carousel Section */}
+      <FitnessCarousel />
     </div>
   );
 }
