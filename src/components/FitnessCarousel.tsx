@@ -65,8 +65,13 @@ export default function FitnessCarousel() {
 
   useEffect(() => {
     intervalRef.current = setInterval(nextSlide, 5000);
-    return () => intervalRef.current && clearInterval(intervalRef.current);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, []);
+
 
   useEffect(() => {
     if (leftRef.current) {

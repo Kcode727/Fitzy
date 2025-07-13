@@ -1,17 +1,18 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react'; // 👈 added
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
+  const { data: session } = useSession(); // 👈 get auth state
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -19,14 +20,18 @@ export default function Navbar() {
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
 
+  const activeColor = '#ff8a8a';
+
+  // 👇 dynamic navItems based on login
   const navItems = [
     { path: '/', name: 'Home' },
     { path: '/workout', name: 'Work Out' },
-    { path: '/tracker', name: 'Calorie Tracker' },
-    { path: '/profile', name: 'Profile' },
+    { path: '/recipes', name: 'Recipes' },
+    { path: '/blog', name: 'Blog' },
+    session
+      ? { path: '/my-space', name: 'My Space' }
+      : { path: '/signin', name: 'Sign In' },
   ];
-
-  const activeColor = '#ff8a8a';
 
   return (
     <nav
@@ -42,48 +47,36 @@ export default function Navbar() {
           className="md:hidden flex flex-col gap-1 w-10 h-10 justify-center items-center z-50"
           aria-label="Toggle Menu"
         >
-          <span
-            className={`h-0.5 w-6 bg-white transition-all duration-300 ${
-              isOpen ? 'rotate-45 translate-y-1.5' : ''
-            }`}
-          />
-          <span
-            className={`h-0.5 w-6 bg-white transition-all duration-300 ${
-              isOpen ? 'opacity-0' : ''
-            }`}
-          />
-          <span
-            className={`h-0.5 w-6 bg-white transition-all duration-300 ${
-              isOpen ? '-rotate-45 -translate-y-1.5' : ''
-            }`}
-          />
+          <span className={`h-0.5 w-6 bg-white transition-all duration-300 ${isOpen ? 'rotate-45 translate-y-1.5' : ''}`} />
+          <span className={`h-0.5 w-6 bg-white transition-all duration-300 ${isOpen ? 'opacity-0' : ''}`} />
+          <span className={`h-0.5 w-6 bg-white transition-all duration-300 ${isOpen ? '-rotate-45 -translate-y-1.5' : ''}`} />
         </button>
 
         {/* Desktop Nav */}
         <ul className="hidden md:flex justify-center items-center w-full gap-x-6 sm:gap-x-8 md:gap-x-12 lg:gap-x-16 xl:gap-x-24">
-  {navItems.map((item) => (
-    <li key={item.path} className="overflow-hidden">
-      <Link
-        href={item.path}
-        className="relative font-medium transition-colors duration-300 group"
-        style={{
-          fontFamily: 'var(--font-jakarta)',
-          fontSize: '1.2rem',
-          color: pathname === item.path ? activeColor : '#ffffff',
-        }}
-      >
-        {item.name}
-        <span
-          className="absolute left-0 bottom-0 top-6 h-0.5 transition-all duration-300 group-hover:w-full"
-          style={{
-            backgroundColor: activeColor,
-            width: pathname === item.path ? '100%' : '0%',
-          }}
-        ></span>
-      </Link>
-    </li>
-  ))}
-</ul>
+          {navItems.map((item) => (
+            <li key={item.path} className="overflow-hidden">
+              <Link
+                href={item.path}
+                className="relative font-medium transition-colors duration-300 group"
+                style={{
+                  fontFamily: 'var(--font-jakarta)',
+                  fontSize: '1.2rem',
+                  color: pathname === item.path ? activeColor : '#ffffff',
+                }}
+              >
+                {item.name}
+                <span
+                  className="absolute left-0 bottom-0 top-6 h-0.5 transition-all duration-300 group-hover:w-full"
+                  style={{
+                    backgroundColor: activeColor,
+                    width: pathname === item.path ? '100%' : '0%',
+                  }}
+                />
+              </Link>
+            </li>
+          ))}
+        </ul>
 
         {/* Mobile Nav Overlay */}
         <div
@@ -108,7 +101,7 @@ export default function Navbar() {
                   backgroundColor: activeColor,
                   width: pathname === item.path ? '100%' : '0',
                 }}
-              ></span>
+              />
             </Link>
           ))}
         </div>

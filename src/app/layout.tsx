@@ -1,4 +1,7 @@
+'use client';
+
 import type { Metadata } from "next";
+import { SessionProvider } from "next-auth/react";
 import { Shrikhand, Plus_Jakarta_Sans, DM_Serif_Display } from 'next/font/google';
 import "./globals.css";
 import Navbar from "../components/Navbar";
@@ -20,7 +23,7 @@ const dmSerif = DM_Serif_Display({
   variable: '--font-dm-serif',
 });
 
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: "Fitzy",
 };
 
@@ -32,8 +35,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${shrikhand.variable} ${plusJakarta.variable} ${dmSerif.variable}`}>
       <body className="bg-black text-white font-sans">
-        <Navbar />
-        {children}
+        <SessionProvider>
+          <Navbar />
+          {children}
+        </SessionProvider>
       </body>
     </html>
   );
