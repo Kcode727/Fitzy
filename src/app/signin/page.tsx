@@ -37,44 +37,35 @@ export default function SignInPage() {
   };
 
   const handleRegister = async () => {
-    setError('');
-    setSuccess('');
+  setError('');
+  setSuccess('');
 
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: 'http://localhost:3000/confirm',
-      },
-    });
+  const { data, error: signUpError } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: 'http://localhost:3000/confirm',
+    },
+  });
 
-    if (signUpError) {
-      setError(signUpError.message);
-      return;
-    }
+  if (signUpError) {
+    setError(signUpError.message);
+    return;
+  }
 
-    const user = data.user;
-    if (!user) return;
+  // Save temporary profile data locally for use after email confirm
+  localStorage.setItem('pendingProfile', JSON.stringify({
+    email,
+    gender,
+    age,
+    weight_kg: weight,
+    height_cm: height,
+  }));
 
-    const { error: profileError } = await supabase.from('profiles').insert([
-      {
-        id: user.id,
-        email,
-        gender,
-        age: Number(age),
-        weight_kg: Number(weight),
-        height_cm: Number(height),
-      },
-    ]);
+  setSuccess('Registration successful! Please check your email to confirm your account.');
+  setIsRegistering(false);
+};
 
-    if (profileError) {
-      setError(profileError.message);
-      return;
-    }
-
-    setSuccess('Registration successful! Please check your email to confirm your account.');
-    setIsRegistering(false);
-  };
 
   return (
     <div className="flex flex-col md:flex-row h-screen w-screen overflow-hidden">
