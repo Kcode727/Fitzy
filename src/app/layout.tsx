@@ -1,10 +1,11 @@
 'use client';
 
-import type { Metadata } from "next";
-import { SessionProvider } from "next-auth/react";
+import { usePathname } from 'next/navigation';
+import { SessionContextProvider } from '@supabase/auth-helpers-react';
+import { supabase } from '@/lib/supabase'; // must match your `lib/supabase.ts`
 import { Shrikhand, Plus_Jakarta_Sans, DM_Serif_Display } from 'next/font/google';
-import "./globals.css";
-import Navbar from "../components/Navbar";
+import Navbar from '../components/Navbar';
+import './globals.css';
 
 const shrikhand = Shrikhand({
   variable: '--font-shrikhand',
@@ -23,22 +24,17 @@ const dmSerif = DM_Serif_Display({
   variable: '--font-dm-serif',
 });
 
-const metadata: Metadata = {
-  title: "Fitzy",
-};
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const hideNavbar = ['/signin', '/myspace', '/myspace/caltrack'].includes(pathname);
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
   return (
     <html lang="en" className={`${shrikhand.variable} ${plusJakarta.variable} ${dmSerif.variable}`}>
       <body className="bg-black text-white font-sans">
-        <SessionProvider>
-          <Navbar />
+        <SessionContextProvider supabaseClient={supabase}>
+          {!hideNavbar && <Navbar />}
           {children}
-        </SessionProvider>
+        </SessionContextProvider>
       </body>
     </html>
   );

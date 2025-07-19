@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react'; // 👈 added
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const { data: session } = useSession(); // 👈 get auth state
+  const session = useSession();
+  const supabase = useSupabaseClient();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -20,16 +21,20 @@ export default function Navbar() {
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    closeMenu();
+  };
+
   const activeColor = '#ff8a8a';
 
-  // 👇 dynamic navItems based on login
   const navItems = [
     { path: '/', name: 'Home' },
     { path: '/workout', name: 'Work Out' },
     { path: '/recipes', name: 'Recipes' },
     { path: '/blog', name: 'Blog' },
     session
-      ? { path: '/my-space', name: 'My Space' }
+      ? { path: '/myspace', name: 'My Space' }
       : { path: '/signin', name: 'Sign In' },
   ];
 
@@ -40,8 +45,6 @@ export default function Navbar() {
       } md:bg-black/50 md:backdrop-blur-md`}
     >
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
-
-        {/* Hamburger Toggle */}
         <button
           onClick={toggleMenu}
           className="md:hidden flex flex-col gap-1 w-10 h-10 justify-center items-center z-50"
@@ -52,10 +55,9 @@ export default function Navbar() {
           <span className={`h-0.5 w-6 bg-white transition-all duration-300 ${isOpen ? '-rotate-45 -translate-y-1.5' : ''}`} />
         </button>
 
-        {/* Desktop Nav */}
         <ul className="hidden md:flex justify-center items-center w-full gap-x-6 sm:gap-x-8 md:gap-x-12 lg:gap-x-16 xl:gap-x-24">
           {navItems.map((item) => (
-            <li key={item.path} className="overflow-hidden">
+            <li key={item.path}>
               <Link
                 href={item.path}
                 className="relative font-medium transition-colors duration-300 group"
@@ -76,9 +78,15 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
+          {session && (
+            <li>
+              <button onClick={handleSignOut} className="text-white hover:text-red-400 text-lg">
+                Sign Out
+              </button>
+            </li>
+          )}
         </ul>
 
-        {/* Mobile Nav Overlay */}
         <div
           className={`fixed inset-0 bg-black/95 flex flex-col items-center justify-center gap-8 text-white text-2xl transform transition-transform duration-300 ${
             isOpen ? 'translate-x-0' : '-translate-x-full'
@@ -104,6 +112,11 @@ export default function Navbar() {
               />
             </Link>
           ))}
+          {session && (
+            <button onClick={handleSignOut} className="text-white hover:text-red-400 text-xl">
+              Sign Out
+            </button>
+          )}
         </div>
       </div>
     </nav>
