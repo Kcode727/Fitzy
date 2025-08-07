@@ -1,14 +1,15 @@
-import { useState } from 'react'
-import ImageContainer from './components/ImgContainer.jsx'
-import './App.css'
+import { useState } from 'react';
+import ImageContainer from './components/ImgContainer.jsx';
+import Navbar from './components/Navbar.jsx';  
+import './App.css';
 
 function App() {
-
   return (
     <>
-    <ImageContainer />
+      <Navbar />             
+      <ImageContainer />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

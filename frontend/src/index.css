@@ -66,3 +66,45 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Shrikhand&family=DM+Serif+Display&display=swap');
+
+/* Custom font classes */
+.font-shrikhand {
+  font-family: 'Shrikhand', cursive;
+}
+
+.font-dmserif {
+  font-family: 'DM Serif Display', serif;
+}
+
+/* Main heading with layered shadows */
+.fitzy-text {
+  position: relative;
+  font-family: 'Shrikhand', cursive;
+  font-size: clamp(3rem, 10vw, 10rem);
+  font-weight: lighter;
+  color: white;
+  z-index: 2;
+  margin: 0;
+}
+
+.fitzy-text::before,
+.fitzy-text::after {
+  content: "Fitzy";
+  position: absolute;
+  z-index: -1;
+}
+
+.fitzy-text::before {
+  top: 10px;
+  left: 15px;
+  color: #525252;
+}
+
+.fitzy-text::after {
+  top: 5px;
+  left: 10px;
+  color: #181717;
+}
+
