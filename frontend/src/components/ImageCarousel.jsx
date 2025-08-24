@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import './ImageCarousel.css'; // move styles here or use CSS-in-JS
-// ✅ Import images correctly
+import './ImageCarousel.css';
+// ✅ Import images
 import img6 from "../assets/6.jpg";
 import img9 from "../assets/9.jpg";
 import img8 from "../assets/8.jpg";

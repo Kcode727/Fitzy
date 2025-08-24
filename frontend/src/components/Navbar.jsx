@@ -1,26 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import "./Navbar.css";
 
 export default function Navbar() {
+  const location = useLocation();
+  // Hide navbar on any route starting with /mySpace
+  if (location.pathname.startsWith("/mySpace")) {
+    return null; 
+  }
+
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    // Check login status
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token); 
   }, []);
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
 
+  const links = [
+    { path: "/", name: "Home" },
+    { path: "/workout", name: "Work Out" },
+    { path: "/meals", name: "Meals" },
+    isLoggedIn
+      ? { path: "/dashboard", name: "My Space" } // If logged in
+      : { path: "/signin", name: "Sign in" },    // If not logged in
+  ];
+
   return (
     <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="navbar-container">
-
         <button
           className={`menu-toggle ${isOpen ? "open" : ""}`}
           onClick={toggleMenu}
@@ -33,13 +46,7 @@ export default function Navbar() {
       </div>
 
       <ul className={`nav-links ${isOpen ? "open" : ""}`}>
-        {[
-          { path: "/", name: "Home" },
-          { path: "/workout", name: "Work Out" },
-          { path: "/meals", name: "Meals" },
-          { path: "/plan", name: "My Plan" },
-          { path: "/profile", name: "Profile" }
-        ].map((item) => (
+        {links.map((item) => (
           <li key={item.path}>
             <NavLink
               to={item.path}
