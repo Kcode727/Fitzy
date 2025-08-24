@@ -117,7 +117,7 @@ const Register = () => {
         )}
 
         <div className="auth-link">
-          Already have an account? <span className="link" onClick={() => (window.location.href = "/signin")}>Sign in here</span>
+          Already have an account? <span className="link" onClick={() => navigate('/signin')}>Sign in here</span>
         </div>
       </div>
     </div>

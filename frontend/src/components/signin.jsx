@@ -84,7 +84,7 @@ const SignIn = () => {
         )}
 
         <div className="auth-link">
-          Don't have an account? <span className="link" onClick={() => window.location.href = '/register'}>Register here</span>
+          Don't have an account? <span className="link" onClick={() => navigate('/register')}>Register here</span>
         </div>
       </div>
     </div>
